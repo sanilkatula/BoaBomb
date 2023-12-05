@@ -2,43 +2,57 @@
 #include <OpenGL/gl.h>
 #include <GL/freeglut.h>
 
+
 void update(int value);
+
 
 int appleX, appleY;
 bool timerActive = false;
 
+
 const int width = 500;
 const int height = 500;
 // Height and Width of Window
+
 
 const int boundaryLeft = 0;
 const int boundaryRight = width;
 const int boundaryTop = height;
 const int boundaryBottom = 0;
 
+
 int snakeSize = 20;                     // Size of each pixel on the screen
 int snakeX[100], snakeY[100];           // Coordinates of the Snake
 int direction = 0;                      // 0: right, 1: up, 2: left, 3: down
+
+
 
 
 int boxX = width - 120;                 // Initial position of the npc1
 int boxY = height - 120;
 
 
+
+
 int box2X = width / 2 - snakeSize;      // Initial position of npc2
 int box2Y = height - snakeSize;
+
+
 
 
 int box3X = width + snakeSize;          // Initial position of npc3
 int box3Y = height / 2 - snakeSize;
 
+
 int snakeLength = 1;
 
+
 const int BOMB_TICK_LIMIT = 5;
-const int BOMB_TICK_RATE = 1000; 
+const int BOMB_TICK_RATE = 1000;
 int bombX, bombY;
 int bombTicks = 0;
 int bombTickTimer = 0;
+
 
 void drawApple() {
     glColor3f(1.0, 0.0, 0.0);           // Red color for the apple
@@ -50,11 +64,13 @@ void drawApple() {
     glEnd();
 }
 
+
 void drawBomb() {
     if (bombTicks < BOMB_TICK_LIMIT) {
         // Interpolate color from dark blue to bright blue
         float colorIntensity = (float)bombTicks / BOMB_TICK_LIMIT;
         glColor3f(0.0, 0.0, 0.5 + 0.5 * colorIntensity); // Increasing blue intensity
+
 
         glBegin(GL_QUADS);
         glVertex2i(bombX, bombY);
@@ -64,6 +80,9 @@ void drawBomb() {
         glEnd();
     }
 }
+
+
+
 
 
 
@@ -80,6 +99,8 @@ void drawSnake() {
 }
 
 
+
+
 void drawNPC(int x, int y) {
     // Draws the box of npc at the specified x and y coordinates
     glColor3f(1.0, 1.0, 1.0);                               // Box color (white)
@@ -91,9 +112,11 @@ void drawNPC(int x, int y) {
     glEnd();
 }
 
+
 void drawBoundary() {
     glColor3f(0.6f, 0.3f, 0.0f);                            // Brown color
     glLineWidth(10.0);                                      // Set the line width for the boundary
+
 
     glBegin(GL_LINE_LOOP);                                  // Using GL_LINE_LOOP to draw a continuous line
     glVertex2i(boundaryLeft, boundaryBottom);               // Bottom left corner
@@ -103,7 +126,9 @@ void drawBoundary() {
     glEnd();
 }
 
+
 void init() {
+
 
     appleX = (width / 2) - (snakeSize / 2);     // Centered horizontally
     appleY = 5*snakeSize;                       // One segment above the bottom
@@ -114,8 +139,11 @@ void init() {
 }
 
 
+
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);               // Clears the screen after every frame
+
 
     drawSnake();
     drawNPC(boxX, boxY);      // NPC1
@@ -125,8 +153,11 @@ void display() {
     drawApple();
     drawBomb(); // Draw the bomb
 
+
     glutSwapBuffers(); // Swaps the background to the back and the moving objects to the front
 }
+
+
 
 
 void keyboard(int key, int, int) {
@@ -152,6 +183,8 @@ void keyboard(int key, int, int) {
 }
 
 
+
+
 bool checkCollision(int x1, int y1, int size1, int x2, int y2, int size2) {
     return x1 < x2 + size2 &&
            x1 + size1 > x2 &&
@@ -159,12 +192,17 @@ bool checkCollision(int x1, int y1, int size1, int x2, int y2, int size2) {
            y1 + size1 > y2;
 }
 
+
 void placeApple() {
     bool applePlaced = false;
     while (!applePlaced) {
         appleX = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
         appleY = (rand() % ((boundaryTop - snakeSize) / snakeSize)) * snakeSize;
-
+        while (appleX == bombX && appleY == bombY) {
+            //make sure the apple cannot overlap with the bomb
+            appleX = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
+            appleY = (rand() % ((boundaryTop - snakeSize) / snakeSize)) * snakeSize;
+        }
         applePlaced = true;
         for (int i = 0; i < snakeLength; i++) {
             if (appleX == snakeX[i] && appleY == snakeY[i]) {
@@ -175,6 +213,7 @@ void placeApple() {
     }
 }
 
+
 // Function to place the bomb at a random location
 void placeBomb() {
     // Random position for bomb
@@ -183,7 +222,9 @@ void placeBomb() {
     bombTicks = 0; // Reset ticks
     bombTickTimer = 0; // Reset bomb tick timer
 
+
 }
+
 
 bool checkBombCollision() {
     if (bombTicks < BOMB_TICK_LIMIT) {
@@ -192,6 +233,7 @@ bool checkBombCollision() {
     return false;
 }
 
+
 bool isGameOver = false;
 void resetGame() {
     snakeLength = 1;
@@ -199,18 +241,23 @@ void resetGame() {
     snakeY[0] = 100;
     direction = 0; // Initial direction
 
+
     placeApple(); // Place a new apple
+
 
     // Restart the game loop
     isGameOver = false;
+
 
     if (!timerActive) {
         timerActive = true;
         glutTimerFunc(100, update, 0);
     }
 
+
     glutPostRedisplay();
 }
+
 
 void update(int) {
     timerActive = false;
@@ -219,11 +266,13 @@ void update(int) {
         return;
     }
 
+
     // Move the snake's body
     for (int i = snakeLength - 1; i > 0; i--) {
         snakeX[i] = snakeX[i - 1];
         snakeY[i] = snakeY[i - 1];
     }
+
 
     // Update snake head position based on direction
     switch (direction) {
@@ -241,16 +290,28 @@ void update(int) {
             break;
     }
 
+
+    // Check for collision with the snake's own body
+    for (int i = 1; i < snakeLength; i++) {
+        if (snakeX[0] == snakeX[i] && snakeY[0] == snakeY[i]) {
+            isGameOver = true;
+            return;
+        }
+    }
+
+
     // Increment bomb tick timer
     bombTickTimer += 100; // Assuming update is called every 100 milliseconds
     if (bombTickTimer >= BOMB_TICK_RATE) {
         bombTicks++;
         bombTickTimer = 0; // Reset bomb tick timer
 
+
         if (bombTicks >= BOMB_TICK_LIMIT) {
             placeBomb(); // Place the bomb at a new location
         }
     }
+
 
     // Check for boundary collision
     if (snakeX[0] >= boundaryRight || snakeX[0] < boundaryLeft ||
@@ -258,11 +319,13 @@ void update(int) {
         isGameOver = true;
     }
 
+
     // Check for collision with the apple
     if (snakeX[0] == appleX && snakeY[0] == appleY) {
         snakeLength++; // Increase the length of the snake
         placeApple(); // Place a new apple
     }
+
 
     // Check for collisions with NPCs
     if (checkCollision(snakeX[0], snakeY[0], snakeSize, boxX, boxY, snakeSize) ||
@@ -272,29 +335,38 @@ void update(int) {
         return; // Stop updating if a collision is detected
     }
 
+
     // Check for collisions with Bombs
     if (checkBombCollision()) {
         isGameOver = true;
         return; // Stop updating if a collision is detected
     }
 
+
     // Update NPCs' positions
-    boxX += snakeSize;
-    box2X += snakeSize;
-    box3X -= snakeSize;
+    boxX += snakeSize/5;
+    box2X -= snakeSize/4;
+    box3Y -= snakeSize/3;
+
 
     // Wrap NPCs to the opposite side when reaching the edges
     if (boxX >= width) {
         boxX = 0;
+        boxY = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
     }
 
-    if (box2X >= width) {
-        box2X = 0;
+
+    if (box2X <= 0) {
+        box2X = width;
+        boxY = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
     }
 
-    if (box3X < 0) {
-        box3X = width - snakeSize;
+
+    if (box3Y < 0) {
+        box3X = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
+        box3Y = width - snakeSize;
     }
+
 
     glutPostRedisplay();
     if (!timerActive) {
@@ -302,6 +374,10 @@ void update(int) {
         glutTimerFunc(100, update, 0);
     }
 }
+
+
+
+
 
 
 //for easily operation of the game
@@ -314,6 +390,8 @@ void keyboardRegular(unsigned char key, int x, int y) {
 }
 
 
+
+
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(2 | 0);
@@ -323,11 +401,16 @@ int main(int argc, char** argv) {
     drawApple(); // Draw the apple
     drawBomb();
 
+
     init();
+
+
 
 
     glutSpecialFunc(keyboard); // Keeps track of keybord inputs
     glutDisplayFunc(display); // Initilizes the Objects
+
+
 
 
     if (!timerActive) {
@@ -335,9 +418,18 @@ int main(int argc, char** argv) {
         glutTimerFunc(100, update, 0);
     }
 
+
     glutMainLoop();
+
 
     return 0;
 }
+
+
+
+
+
+
+
 
 
