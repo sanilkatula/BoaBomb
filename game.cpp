@@ -3,7 +3,7 @@
 #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <cstdio>
-#include "draw.cpp"
+#include "place.cpp"
 
 bool inMenu = true; 
 bool isGameOver = false;
@@ -42,6 +42,7 @@ void display() {
         drawApple();
         drawBomb(); // Draw the bomb
         drawScore();
+        drawGoldenApple();
         }
     glutSwapBuffers(); // Swaps the background to the back and the moving objects to the front
 }
@@ -83,39 +84,6 @@ bool checkCollision(int x1, int y1, int size1, int x2, int y2, int size2) {
 }
 
 
-void placeApple() {
-    bool applePlaced = false;
-    while (!applePlaced) {
-        appleX = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
-        appleY = (rand() % ((boundaryTop - snakeSize) / snakeSize)) * snakeSize;
-        while (appleX == bombX && appleY == bombY) {
-            //make sure the apple cannot overlap with the bomb
-            appleX = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
-            appleY = (rand() % ((boundaryTop - snakeSize) / snakeSize)) * snakeSize;
-        }
-        applePlaced = true;
-        for (int i = 0; i < snakeLength; i++) {
-            if (appleX == snakeX[i] && appleY == snakeY[i]) {
-                applePlaced = false;
-                break;
-            }
-        }
-    }
-}
-
-
-// Function to place the bomb at a random location
-void placeBomb() {
-    // Random position for bomb
-    bombX = (rand() % ((boundaryRight - snakeSize) / snakeSize)) * snakeSize;
-    bombY = (rand() % ((boundaryTop - snakeSize) / snakeSize)) * snakeSize;
-    bombTicks = 0; // Reset ticks
-    bombTickTimer = 0; // Reset bomb tick timer
-
-
-}
-
-
 bool checkBombCollision() {
     if (bombTicks < BOMB_TICK_LIMIT) {
         return checkCollision(snakeX[0], snakeY[0], snakeSize, bombX, bombY, snakeSize);
@@ -125,8 +93,9 @@ bool checkBombCollision() {
 
 
 void resetGame() {
-    snakeLength = 1;
-    snakeX[0] = 100; // Reset snake's initial position
+    snakeLength = 1; 
+    goldenAppleActive = false;
+    normalApplesEaten = 0;    snakeX[0] = 100; // Reset snake's initial position
     snakeY[0] = 100;
     direction = 0; // Initial direction
 
@@ -211,8 +180,19 @@ void update(int) {
 
     // Check for collision with the apple
     if (snakeX[0] == appleX && snakeY[0] == appleY) {
-        snakeLength++; // Increase the length of the snake
-        placeApple(); // Place a new apple
+        snakeLength++;
+        normalApplesEaten++;
+        placeApple(); // Place a new normal apple
+
+        if (normalApplesEaten % GOLDEN_APPLE_FREQUENCY == 0) {
+            placeGoldenApple(); // Function to place the golden apple
+            goldenAppleActive = true;
+        }
+    }
+
+    if (goldenAppleActive && snakeX[0] == goldenAppleX && snakeY[0] == goldenAppleY) {
+        snakeLength += 2; // Increase length by 2 for the golden apple
+        goldenAppleActive = false; // Golden apple is eaten
     }
 
 

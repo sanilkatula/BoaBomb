@@ -8,6 +8,11 @@
 int appleX, appleY;
 bool timerActive = false;
 
+int normalApplesEaten = 0;
+int goldenAppleX, goldenAppleY;
+bool goldenAppleActive = false;
+const int GOLDEN_APPLE_FREQUENCY = 10; 
+
 const int width = 500;
 const int height = 500;
 // Height and Width of Window
@@ -34,8 +39,6 @@ int box2X = width / 2 - snakeSize;      // Initial position of npc2
 int box2Y = height - snakeSize;
 
 
-
-
 int box3X = width + snakeSize;          // Initial position of npc3
 int box3Y = height / 2 - snakeSize;
 
@@ -58,6 +61,20 @@ void drawApple() {
     glVertex2i(appleX + snakeSize, appleY + snakeSize);
     glVertex2i(appleX, appleY + snakeSize);
     glEnd();
+}
+
+
+void drawGoldenApple() {
+    if (goldenAppleActive) {
+        // Set color to gold
+        glColor3f(1.0, 0.84, 0.0); // RGB for gold
+        glBegin(GL_QUADS);
+        glVertex2i(goldenAppleX, goldenAppleY);
+        glVertex2i(goldenAppleX + snakeSize, goldenAppleY);
+        glVertex2i(goldenAppleX + snakeSize, goldenAppleY + snakeSize);
+        glVertex2i(goldenAppleX, goldenAppleY + snakeSize);
+        glEnd();
+    }
 }
 
 
