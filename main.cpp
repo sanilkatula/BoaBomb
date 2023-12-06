@@ -7,33 +7,22 @@
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(2 | 0);
-    glutInitWindowSize(width, height); // Creates the window
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowSize(width, height);
     glutCreateWindow("BoaBomb");
-    glutKeyboardFunc(keyboardRegular);
-    drawApple(); // Draw the apple
-    drawBomb();
 
+    init(); // Ensure all initialization is done first
 
-    init();
-
-
-
-
-    glutSpecialFunc(keyboard); // Keeps track of keybord inputs
-    glutDisplayFunc(display); // Initilizes the Objects
-
-
-
+    glutKeyboardFunc(keyboardRegular); // Set up keyboard input
+    glutSpecialFunc(keyboard); // Set up special key input (like arrow keys)
+    glutDisplayFunc(display); // Set up the display function
 
     if (!timerActive) {
         timerActive = true;
-        glutTimerFunc(100, update, 0);
+        glutTimerFunc(100, update, 0); // Start the timer for game updates
     }
 
-
     glutMainLoop();
-
 
     return 0;
 }

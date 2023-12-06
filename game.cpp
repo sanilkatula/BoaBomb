@@ -5,6 +5,9 @@
 #include <cstdio>
 #include "draw.cpp"
 
+bool inMenu = true; 
+bool isGameOver = false;
+
 void update(int value);
 
 void init() {
@@ -22,18 +25,24 @@ void init() {
 
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);               // Clears the screen after every frame
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    if (isGameOver) {
+        drawGameOverScreen();
 
-    drawSnake();
-    drawNPC(boxX, boxY);      // NPC1
-    drawNPC(box2X, box2Y);    // NPC2
-    drawNPC(box3X, box3Y);    // NPC3
-    drawBoundary(); // Draw the boundary
-    drawApple();
-    drawBomb(); // Draw the bomb
-    drawScore();
+    } else if (inMenu) {
+            drawMenu();
 
+    } else {
+        drawSnake();
+        drawNPC(boxX, boxY);      // NPC1
+        drawNPC(box2X, box2Y);    // NPC2
+        drawNPC(box3X, box3Y);    // NPC3
+        drawBoundary(); // Draw the boundary
+        drawApple();
+        drawBomb(); // Draw the bomb
+        drawScore();
+        }
     glutSwapBuffers(); // Swaps the background to the back and the moving objects to the front
 }
 
@@ -42,6 +51,7 @@ void display() {
 
 void keyboard(int key, int, int) {
     // Moves the snake
+
     switch (key) {
         case GLUT_KEY_UP:
             if (direction != 3)
@@ -114,7 +124,6 @@ bool checkBombCollision() {
 }
 
 
-bool isGameOver = false;
 void resetGame() {
     snakeLength = 1;
     snakeX[0] = 100; // Reset snake's initial position
@@ -141,7 +150,7 @@ void resetGame() {
 
 void update(int) {
     timerActive = false;
-    if (isGameOver) {
+    if (isGameOver || inMenu) {
         glutPostRedisplay();
         return;
     }
@@ -257,18 +266,33 @@ void update(int) {
 }
 
 
-
-
-
-
 //for easily operation of the game
 void keyboardRegular(unsigned char key, int x, int y) {
-    if (key == 27) { // ESC key
-        exit(0);
-    } else if (key == 'r' || key == 'R') {
-        resetGame(); // Restart the game when 'R' is pressed
+    if (isGameOver) {
+        if (key == 'r' || key == 'R') {
+            resetGame(); // Reset the game
+            isGameOver = false;
+            inMenu = true; // Optionally, go back to the menu after resetting
+        } else if (key == 27) { // ESC key
+            exit(0); // Exit the game
+        }
+    } else if (inMenu) {
+        if (key == 13) { // Enter key
+            inMenu = false; // Exit menu and start the game
+        } else if (key == 27) { // ESC key
+            exit(0); // Exit the game
+        }
+    } else {
+        if (key == 27) { // ESC key
+            exit(0); // Exit the game
+        } else if (key == 'r' || key == 'R' || key == 13 ) {
+            resetGame(); // Restart the game when 'R' is pressed
+        }
     }
+
+    glutPostRedisplay(); // Refresh the display after handling key input
 }
+
 
 
 
