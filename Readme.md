@@ -65,6 +65,19 @@ Ensure you have a suitable C++ compiler installed on your system to compile the 
 * After successful compilation, start the game by entering:
   * _./play_
 
+## Structure of Programming Files ##
+
+1. Header Files
+ * gameConstants.h
+ * globals.h
+ * playerScore.h
+
+2. Source Files
+ * draw.cpp
+ * game.cpp
+ * place.cpp
+ * main.cpp
+
 ## draw.cpp ## 
 
 * ```drawApple():``` </br>
@@ -120,6 +133,23 @@ Updates the game state, including snake movement, collision checks, and NPC upda
 * ```keyboardRegular(unsigned char key, int x, int y):``` </br>
 Handles regular key input, such as 'R' for restarting the game or ESC for exiting.
 
+## place.cpp ##
+
+* ```placeApple():``` </br>
+- Places a regular apple randomly within game boundaries.
+- Ensures no overlap with the snake's body or the bomb.
+- Uses a loop for random coordinate generation until a suitable position is found.
+
+* ```placeGoldenApple():``` </br>
+- Places a golden apple with specific criteria for positioning.
+- Avoids overlap with the snake, normal apples, or the bomb.
+- Uses a loop to find a suitable location.
+
+* ```placeBomb():``` </br>
+- Places a bomb randomly within game boundaries.
+- Ensures no immediate collision with the snake or existing apples.
+- Resets the bomb's tick count and tick timer for the next round.
+
 ## main.cpp ##
 
 * ```main(int argc, char** argv): ``` </br>
@@ -141,4 +171,8 @@ Thank you for playing BoaBomb!
 4. Sanil
 
 ### _Enjoy playing BoaBomb!_ ###
+
+
+
+
 
