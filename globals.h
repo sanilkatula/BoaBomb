@@ -7,4 +7,11 @@
 #define MAX_SCORES 7
 extern PlayerScore highScores[MAX_SCORES]; // Global declaration
 
+typedef enum {
+    ARROW_UP,
+    ARROW_DOWN,
+    ARROW_LEFT,
+    ARROW_RIGHT
+} ArrowDirection;
+
 #endif // GLOBALS_H

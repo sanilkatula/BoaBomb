@@ -1,7 +1,6 @@
 #define GL_SILENCE_DEPRECATION
 
-// #include <GL/freeglut.h>
-#include <GL/gl.h>
+// #include <GL/gl.h>
 #include <cstdio>
 #include "place.cpp"
 #include <cctype> 
@@ -37,9 +36,9 @@ void display() {
     } else {
         // Main game rendering
         drawSnake();
-        drawNPC(boxX, boxY);      // NPC1
-        drawNPC(box2X, box2Y);    // NPC2
-        drawNPC(box3X, box3Y);    // NPC3
+        drawNPC(boxX, boxY, ARROW_RIGHT);   // NPC1 moving right
+        drawNPC(box2X, box2Y, ARROW_LEFT);  // NPC2 moving left
+        drawNPC(box3X, box3Y, ARROW_UP);    // NPC3 moving up
         drawBoundary(); // Draw the boundary
         drawApple();
         drawBomb(); // Draw the bomb
@@ -49,7 +48,6 @@ void display() {
 
     glutSwapBuffers();
 }
-
 
 
 
