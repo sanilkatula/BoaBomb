@@ -13,6 +13,7 @@ int main(int argc, char** argv) {
 
     init(); // Ensure all initialization is done first
 
+    loadHighScores();
     glutKeyboardFunc(keyboardRegular); // Set up keyboard input
     glutSpecialFunc(keyboard); // Set up special key input (like arrow keys)
     glutDisplayFunc(display); // Set up the display function

@@ -4,6 +4,14 @@
 #include <GL/gl.h>
 #include <cstdio>
 #include <cstring>
+#include "gameConstants.h"
+#include "playerScore.h"
+#include "globals.h"
+
+PlayerScore highScores[MAX_SCORES]; // Definition
+char playerName[50];
+bool isEnteringName = false;
+int nameLength = 0;
 
 int appleX, appleY;
 bool timerActive = false;
@@ -218,10 +226,10 @@ void drawGameOverScreen() {
     int restartPosX = width / 2 - (strlen(restartText) * 9) / 2;
     int exitPosX = width / 2 - (strlen(exitText) * 9) / 2;
 
-    int gameOverPosY = height / 2 + 60;
-    int scorePosY = height / 2 + 30;
-    int restartPosY = height / 2;
-    int exitPosY = height / 2 - 30;
+    int gameOverPosY = 2*height / 3 + 60;
+    int scorePosY = 2*height / 3 + 30;
+    int restartPosY = 2*height / 3;
+    int exitPosY = 2*height / 3 - 30;
 
     // Set colors and draw each line of text
     glColor3f(1.0, 0.0, 0.0); // Red color for "Game Over"
@@ -246,3 +254,89 @@ void drawGameOverScreen() {
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *c);
     }
 }
+
+
+void loadHighScores() {
+    FILE *file = fopen("highscores.txt", "r");
+    if (file != NULL) {
+        fread(highScores, sizeof(PlayerScore), MAX_SCORES, file);
+        fclose(file);
+    }
+}
+
+void saveHighScores() {
+    FILE *file = fopen("highscores.txt", "w");
+    if (file != NULL) {
+        fwrite(highScores, sizeof(PlayerScore), MAX_SCORES, file);
+        fclose(file);
+    }
+}
+
+void updateHighScores(int score) {
+    int position = -1;
+    for (int i = 0; i < MAX_SCORES; i++) {
+        if (score > highScores[i].score) {
+            position = i;
+            break;
+        }
+    }
+
+    // If the score is among the top 10, insert it
+    if (position != -1) {
+        // Shift lower scores down
+        for (int i = MAX_SCORES - 1; i > position; i--) {
+            highScores[i] = highScores[i - 1];
+        }
+
+        // Insert the new score at the found position
+        highScores[position].score = score;
+        strcpy(highScores[position].playerName, "new player");
+    }
+}
+
+
+void initializeHighScores() {
+    for (int i = 0; i < MAX_SCORES; i++) {
+        highScores[i].score = 0; // Set a default score, like 0
+        strcpy(highScores[i].playerName, "Empty"); // Default name
+    }
+}
+
+void drawLeaderboardTitle() {
+    const char* title = "Leaderboard";
+    int titlePosX = width / 2 - (strlen(title) * 9) / 2;
+    int titlePosY = height / 2; // Adjust this as needed
+
+    glColor3f(1.0, 1.0, 1.0); // White color for the title
+    glRasterPos2i(titlePosX, titlePosY);
+
+    for (const char* c = title; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *c);
+    }
+}
+
+void drawHighScores() {
+    char scoreText[100];
+    int scoresY = 100; // Starting Y position for the scores
+    int scoresX = width / 3 - 30; // X position for the scores, adjust as needed
+
+    glColor3f(1.0, 1.0, 1.0); // Set text color
+
+    // Draw the title
+    drawLeaderboardTitle();
+
+    // Draw top 5 scores in a single column
+    for (int i = 7; i > 0; i--) { // Limit to top 5 scores
+        snprintf(scoreText, sizeof(scoreText), "%d. %s: %d", i, highScores[i].playerName, highScores[i].score);
+        glRasterPos2i(scoresX, scoresY);
+        scoresY += 20; // Adjust for next score
+
+        for (char* c = scoreText; *c != '\0'; c++) {
+            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *c);
+        }
+    }
+}
+
+
+
+
