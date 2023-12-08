@@ -5,7 +5,7 @@ CXX = clang++
 CXXFLAGS = -framework OpenGL -framework GLUT -lglfw -lGLEW
 
 # Target executable name
-TARGET = my_opengl_app
+TARGET = play
 
 # Source files
 SOURCES = main.cpp
