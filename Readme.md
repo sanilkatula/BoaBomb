@@ -142,7 +142,3 @@ Thank you for playing BoaBomb!
 
 ### _Enjoy playing BoaBomb!_ ###
 
-
-
-
-

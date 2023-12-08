@@ -1,9 +1,10 @@
 #define GL_SILENCE_DEPRECATION
 
-#include <GL/freeglut.h>
+// #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <cstdio>
 #include "place.cpp"
+#include <cctype> 
 
 bool inMenu = true; 
 bool isGameOver = false;
@@ -29,11 +30,12 @@ void display() {
 
     if (isGameOver) {
         drawGameOverScreen();
-
+        drawHighScores();
+        drawLeaderboardTitle();
     } else if (inMenu) {
-            drawMenu();
-
+        drawMenu();
     } else {
+        // Main game rendering
         drawSnake();
         drawNPC(boxX, boxY);      // NPC1
         drawNPC(box2X, box2Y);    // NPC2
@@ -43,9 +45,11 @@ void display() {
         drawBomb(); // Draw the bomb
         drawScore();
         drawGoldenApple();
-        }
-    glutSwapBuffers(); // Swaps the background to the back and the moving objects to the front
+    }
+
+    glutSwapBuffers();
 }
+
 
 
 
@@ -236,7 +240,20 @@ void update(int) {
         box3Y = width - snakeSize;
     }
 
+   if (isGameOver) {
+        isEnteringName = false; // Start name entry
+        updateHighScores(snakeLength - 1);  // Update the leaderboard
+        saveHighScores();                   // Save the updated leaderboard to a file
+        glutPostRedisplay();
+        return;
+    }
 
+// if (isGameOver) {
+//     isEnteringName = true; // Start name entry
+//     // Do not update high scores here; wait until name is entered
+//     glutPostRedisplay();
+//     return;
+// }
 
     glutPostRedisplay();
     if (!timerActive) {
@@ -248,8 +265,11 @@ void update(int) {
 
 //for easily operation of the game
 void keyboardRegular(unsigned char key, int x, int y) {
+
     if (isGameOver) {
         if (key == 'r' || key == 'R') {
+            updateHighScores(4*snakeLength - 1); 
+            saveHighScores();
             resetGame(); // Reset the game
             isGameOver = false;
             inMenu = true; // Optionally, go back to the menu after resetting
@@ -272,8 +292,3 @@ void keyboardRegular(unsigned char key, int x, int y) {
 
     glutPostRedisplay(); // Refresh the display after handling key input
 }
-
-
-
-
-
