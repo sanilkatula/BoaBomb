@@ -1,6 +1,6 @@
 #define GL_SILENCE_DEPRECATION
 
-#include <GL/freeglut.h>
+// #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <cstdio>
 #include <cstring>

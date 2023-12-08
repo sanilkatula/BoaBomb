@@ -1,6 +1,6 @@
 #define GL_SILENCE_DEPRECATION
 
-#include <GL/freeglut.h>    //remove this for csil
+// #include <GL/freeglut.h>    //remove this for csil
 #include <GL/gl.h>
 #include <cstdio>
 #include "game.cpp"
