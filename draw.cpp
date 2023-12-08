@@ -1,12 +1,12 @@
 #define GL_SILENCE_DEPRECATION
 
-// #include <GL/freeglut.h>
-#include <GL/gl.h>
+// #include <GL/gl.h>
 #include <cstdio>
 #include <cstring>
 #include "gameConstants.h"
 #include "playerScore.h"
 #include "globals.h"
+#include <cmath>
 
 PlayerScore highScores[MAX_SCORES]; // Definition
 char playerName[50];
@@ -62,54 +62,125 @@ int bombTickTimer = 0;
 
 
 void drawApple() {
-    glColor3f(1.0, 0.0, 0.0);           // Red color for the apple
+    // Draw apple body
+    glColor3f(1.0, 0.0, 0.0); // Red color for the apple
+    const float radius = snakeSize / 2.0f; // Radius of the circle
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(appleX + radius, appleY + radius); // Center of the circle
+    for (int i = 0; i <= 360; i += 10) {
+        float angle = static_cast<float>(i) * 3.14159f / 180.0f;
+        glVertex2f(appleX + radius + cos(angle) * radius, appleY + radius + sin(angle) * radius);
+    }
+    glEnd();
+
+    // Draw stem at the top
+    glColor3f(0.55, 0.27, 0.07); // Brown color for the stem
+    float stemWidth = radius / 4;
+    float stemHeight = radius / 2;
     glBegin(GL_QUADS);
-    glVertex2i(appleX, appleY);
-    glVertex2i(appleX + snakeSize, appleY);
-    glVertex2i(appleX + snakeSize, appleY + snakeSize);
-    glVertex2i(appleX, appleY + snakeSize);
+    glVertex2f(appleX + radius - stemWidth / 2, appleY + radius * 2);
+    glVertex2f(appleX + radius + stemWidth / 2, appleY + radius * 2);
+    glVertex2f(appleX + radius + stemWidth / 2, appleY + radius * 2 + stemHeight);
+    glVertex2f(appleX + radius - stemWidth / 2, appleY + radius * 2 + stemHeight);
+    glEnd();
+
+    // Draw leaf near the stem
+    glColor3f(0.0, 1.0, 0.0); // Green color for the leaf
+    glBegin(GL_TRIANGLES);
+    glVertex2f(appleX + radius + stemWidth / 2, appleY + radius * 2 + stemHeight / 2);
+    glVertex2f(appleX + radius + stemWidth * 2, appleY + radius * 2 + stemHeight);
+    glVertex2f(appleX + radius + stemWidth / 2, appleY + radius * 2 + stemHeight * 1.5);
     glEnd();
 }
 
 
+
 void drawGoldenApple() {
     if (goldenAppleActive) {
-        // Set color to gold
-        glColor3f(1.0, 0.84, 0.0); // RGB for gold
+        // Draw golden apple body
+        glColor3f(1.0, 0.84, 0.0); // Gold color for the apple
+        const float radius = snakeSize / 2.0f; // Radius of the circle
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(goldenAppleX + radius, goldenAppleY + radius); // Center of the circle
+        for (int i = 0; i <= 360; i += 10) {
+            float angle = static_cast<float>(i) * 3.14159f / 180.0f;
+            glVertex2f(goldenAppleX + radius + cos(angle) * radius, goldenAppleY + radius + sin(angle) * radius);
+        }
+        glEnd();
+
+        // Draw stem at the top
+        glColor3f(0.55, 0.27, 0.07); // Brown color for the stem
+        float stemWidth = radius / 4;
+        float stemHeight = radius / 2;
         glBegin(GL_QUADS);
-        glVertex2i(goldenAppleX, goldenAppleY);
-        glVertex2i(goldenAppleX + snakeSize, goldenAppleY);
-        glVertex2i(goldenAppleX + snakeSize, goldenAppleY + snakeSize);
-        glVertex2i(goldenAppleX, goldenAppleY + snakeSize);
+        glVertex2f(goldenAppleX + radius - stemWidth / 2, goldenAppleY + radius * 2);
+        glVertex2f(goldenAppleX + radius + stemWidth / 2, goldenAppleY + radius * 2);
+        glVertex2f(goldenAppleX + radius + stemWidth / 2, goldenAppleY + radius * 2 + stemHeight);
+        glVertex2f(goldenAppleX + radius - stemWidth / 2, goldenAppleY + radius * 2 + stemHeight);
+        glEnd();
+
+        // Draw leaf near the stem
+        glColor3f(0.0, 1.0, 0.0); // Green color for the leaf
+        glBegin(GL_TRIANGLES);
+        glVertex2f(goldenAppleX + radius + stemWidth / 2, goldenAppleY + radius * 2 + stemHeight / 2);
+        glVertex2f(goldenAppleX + radius + stemWidth * 2, goldenAppleY + radius * 2 + stemHeight);
+        glVertex2f(goldenAppleX + radius + stemWidth / 2, goldenAppleY + radius * 2 + stemHeight * 1.5);
         glEnd();
     }
 }
+
 
 
 void drawBomb() {
-    if (bombTicks < BOMB_TICK_LIMIT) {
-        // Interpolate color from dark blue to bright blue
-        float colorIntensity = (float)bombTicks / BOMB_TICK_LIMIT;
-        glColor3f(0.0, 0.0, 0.5 + 0.5 * colorIntensity); // Increasing blue intensity
+    // Calculate color intensity based on bombTicks
+    float colorIntensity = (float)bombTicks / BOMB_TICK_LIMIT;
+    float blueShade = 0.5 + 0.5 * sin(colorIntensity * 2 * 3.14159f); // Fluctuating blue intensity
 
-
-        glBegin(GL_QUADS);
-        glVertex2i(bombX, bombY);
-        glVertex2i(bombX + snakeSize, bombY);
-        glVertex2i(bombX + snakeSize, bombY + snakeSize);
-        glVertex2i(bombX, bombY + snakeSize);
-        glEnd();
+    // Draw bomb body (similar to apple)
+    glColor3f(0.0, 0.0, blueShade); // Blue color for the bomb
+    const float radius = snakeSize / 2.0f; // Radius of the bomb
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(bombX + radius, bombY + radius); // Center of the circle
+    for (int i = 0; i <= 360; i += 10) {
+        float angle = static_cast<float>(i) * 3.14159f / 180.0f;
+        glVertex2f(bombX + radius + cos(angle) * radius, bombY + radius + sin(angle) * radius);
     }
+    glEnd();
+
+    // Draw fuse (white rope)
+    glColor3f(1.0, 1.0, 1.0); // White color for the fuse
+    float fuseWidth = radius / 8;
+    float fuseHeight = radius/2;
+    glBegin(GL_QUADS);
+    glVertex2f(bombX + radius - fuseWidth / 2, bombY + radius * 2);
+    glVertex2f(bombX + radius + fuseWidth / 2, bombY + radius * 2);
+    glVertex2f(bombX + radius + fuseWidth / 2, bombY + radius * 2 + fuseHeight);
+    glVertex2f(bombX + radius - fuseWidth / 2, bombY + radius * 2 + fuseHeight);
+    glEnd();
+
+    // Draw fire at the end of the fuse
+    glColor3f(1.0, 0.0, 0.0); // Red color for the fire
+    glBegin(GL_TRIANGLES);
+    glVertex2f(bombX + radius, bombY + radius * 2 + fuseHeight);
+    glVertex2f(bombX + radius - fuseWidth, bombY + radius * 2 + fuseHeight * 1.5);
+    glVertex2f(bombX + radius + fuseWidth, bombY + radius * 2 + fuseHeight * 1.5);
+    glEnd();
+
+    glColor3f(1.0, 0.843, 0.0); // Orange color for the fire
+    glBegin(GL_TRIANGLES);
+    glVertex2f(bombX + radius, bombY + radius * 2 + fuseHeight * 1.2);
+    glVertex2f(bombX + radius - fuseWidth * 0.8, bombY + radius * 2 + fuseHeight * 1.7);
+    glVertex2f(bombX + radius + fuseWidth * 0.8, bombY + radius * 2 + fuseHeight * 1.7);
+    glEnd();
 }
 
 
-
-
-
-
 void drawSnake() {
-    glColor3f(0.0, 1.0, 0.0); // Snake color (green)
     for (int i = 0; i < snakeLength; i++) {
+        // Gradient color from head to tail
+        float intensity = (float)i / snakeLength;
+        glColor3f(0.0, intensity, 0.0); // Gradually changing green intensity
+
         glBegin(GL_QUADS);
         glVertex2i(snakeX[i], snakeY[i]);
         glVertex2i(snakeX[i] + snakeSize, snakeY[i]);
@@ -117,20 +188,71 @@ void drawSnake() {
         glVertex2i(snakeX[i], snakeY[i] + snakeSize);
         glEnd();
     }
+
+    // Draw the head with a different color
+    glColor3f(0.0, 0.8, 0.8); // Different color for the head
+    glBegin(GL_QUADS);
+    glVertex2i(snakeX[0], snakeY[0]);
+    glVertex2i(snakeX[0] + snakeSize, snakeY[0]);
+    glVertex2i(snakeX[0] + snakeSize, snakeY[0] + snakeSize);
+    glVertex2i(snakeX[0], snakeY[0] + snakeSize);
+    glEnd();
 }
 
 
+void drawArrow(int x, int y, ArrowDirection direction) {
+    int arrowWidth = snakeSize / 2;  // Width of the arrow body
+    int arrowHeight = snakeSize;     // Length of the arrow body
+    int headHeight = snakeSize / 2;  // Height of the arrow head
 
+    glColor3f(1.0, 1.0, 1.0);  // White color
 
-void drawNPC(int x, int y) {
-    // Draws the box of npc at the specified x and y coordinates
-    glColor3f(1.0, 1.0, 1.0);                               // Box color (white)
+    // Draw the arrow body (rectangle)
     glBegin(GL_QUADS);
-    glVertex2i(x, y);
-    glVertex2i(x + snakeSize, y);
-    glVertex2i(x + snakeSize, y + snakeSize);
-    glVertex2i(x, y + snakeSize);
+    if (direction == ARROW_LEFT || direction == ARROW_RIGHT) {
+        int bodyLength = arrowHeight - headHeight;
+        if (direction == ARROW_LEFT) {
+            x += headHeight;  // Adjust starting x for leftward arrow
+        }
+        glVertex2i(x, y + snakeSize / 2 - arrowWidth / 2);
+        glVertex2i(x, y + snakeSize / 2 + arrowWidth / 2);
+        glVertex2i(x + bodyLength, y + snakeSize / 2 + arrowWidth / 2);
+        glVertex2i(x + bodyLength, y + snakeSize / 2 - arrowWidth / 2);
+    } else {  // ARROW_UP or ARROW_DOWN
+        int bodyLength = arrowHeight - headHeight;
+        if (direction == ARROW_UP) {
+            y += headHeight;  // Adjust starting y for upward arrow
+        }
+        glVertex2i(x + snakeSize / 2 - arrowWidth / 2, y);
+        glVertex2i(x + snakeSize / 2 + arrowWidth / 2, y);
+        glVertex2i(x + snakeSize / 2 + arrowWidth / 2, y + bodyLength);
+        glVertex2i(x + snakeSize / 2 - arrowWidth / 2, y + bodyLength);
+    }
     glEnd();
+
+    // Draw the arrow head (triangle)
+    glBegin(GL_TRIANGLES);
+    if (direction == ARROW_DOWN || direction == ARROW_UP) {
+        // Both ARROW_DOWN and ARROW_UP will have a downward-pointing arrow head
+        glVertex2i(x + snakeSize / 2, y + arrowHeight);  // Bottom point of the triangle
+        glVertex2i(x + snakeSize / 2 - arrowWidth / 2, y + arrowHeight - headHeight);  // Top left
+        glVertex2i(x + snakeSize / 2 + arrowWidth / 2, y + arrowHeight - headHeight);  // Top right
+    } else if (direction == ARROW_LEFT) {
+        glVertex2i(x, y + snakeSize / 2);  // Leftmost point
+        glVertex2i(x + headHeight, y + snakeSize / 2 - arrowWidth / 2);  // Right top
+        glVertex2i(x + headHeight, y + snakeSize / 2 + arrowWidth / 2);  // Right bottom
+    } else if (direction == ARROW_RIGHT) {
+        glVertex2i(x + arrowHeight, y + snakeSize / 2);  // Rightmost point
+        glVertex2i(x + arrowHeight - headHeight, y + snakeSize / 2 - arrowWidth / 2);  // Left top
+        glVertex2i(x + arrowHeight - headHeight, y + snakeSize / 2 + arrowWidth / 2);  // Left bottom
+    }
+
+    glEnd();
+}
+
+
+void drawNPC(int x, int y, ArrowDirection direction) {
+    drawArrow(x, y, direction);
 }
 
 
@@ -218,7 +340,7 @@ void drawGameOverScreen() {
     const char* restartText = "To Restart, Press R";
     const char* exitText = "To Exit, Press ESC";
 
-    snprintf(scoreText, sizeof(scoreText), "Final Score: %d", snakeLength - 1);
+    snprintf(scoreText, sizeof(scoreText), "Score: %d", snakeLength - 1);
 
     // Calculate positions for the text
     int gameOverPosX = width / 2 - (strlen(gameOverText) * 9) / 2;

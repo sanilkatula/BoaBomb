@@ -1,3 +1,20 @@
+Boa Bomb
+
+Welcome to Boa Bomb, an exciting twist on the classic snake game. In this game, you navigate a snake through a field, collecting apples and special items, while avoiding dangerous obstacles. Get ready for an engaging gameplay experience with enhanced features and challenges!
+
+Getting Started
+
+Prerequisites
+Ensure you have a suitable C++ compiler installed on your system to compile the game.
+Clone or download this repository to your local machine.
+
+Installation
+Open your terminal or command prompt.
+Navigate to the directory where you have cloned or downloaded the game files.
+
+Compile the game by typing:
+make
+=======
 # Welcome To BoaBomb !!! #
 
 ## Game Concept Description: ##
@@ -171,8 +188,4 @@ Thank you for playing BoaBomb!
 4. Sanil
 
 ### _Enjoy playing BoaBomb!_ ###
-
-
-
-
 
