@@ -14,4 +14,5 @@ typedef enum {
     ARROW_RIGHT
 } ArrowDirection;
 
+
 #endif // GLOBALS_H
