@@ -58,9 +58,9 @@ Ensure you have a suitable C++ compiler installed on your system to compile the 
 
 **Compile and Run**:
 * There needs to be an OpenGL library installed on the local computer
-* Compile the code using a C++ compiler (e.g., g++)
-  * _g++ main.cpp -o BoaBomb -lGL -lGLU -lglut_
-* Compile the game by typing
+* Compile the code using a C++ compiler (For CSIL)
+  * _clang++ main.cpp -o play -lGL -lGLU -lglut_
+* Compile the game by typing (For MacOS)
   * _make_
 * After successful compilation, start the game by entering:
   * _./play_
